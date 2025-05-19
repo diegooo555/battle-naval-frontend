@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Itim';
+  src: url('/Itim-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-itim {
+  font-family: 'Itim', sans-serif;
+}

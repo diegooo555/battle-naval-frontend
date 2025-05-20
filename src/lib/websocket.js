@@ -1,5 +1,7 @@
 import { Client } from "@stomp/stompjs";
 
+const URL_SOCKET = import.meta.env.VITE_BACKEND_SOCKET_URL;
+
 const disconnect = (stompClient) => {
     if (stompClient.current) {
       stompClient.current.deactivate();
@@ -17,7 +19,7 @@ const connect = (stompClient, username, id, setResultServer) => {
     }
 
     stompClient.current = new Client({
-      brokerURL: `ws://localhost:8080/gs-guide-websocket?id=${id}`,
+      brokerURL: `${URL_SOCKET}/gs-guide-websocket?id=${id}`,
       onConnect: () => {
         console.log("✅ Conectado al servidor WebSocket");
         stompClient.current.subscribe(

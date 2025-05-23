@@ -5,7 +5,6 @@ const URL_SOCKET = import.meta.env.VITE_BACKEND_SOCKET_URL;
 const disconnect = (stompClient) => {
     if (stompClient.current) {
       stompClient.current.deactivate();
-      console.log("🚪 Desconectado del servidor WebSocket");
     }
 };
 
@@ -21,7 +20,6 @@ const connect = (stompClient, username, id, setResultServer) => {
     stompClient.current = new Client({
       brokerURL: `${URL_SOCKET}/gs-guide-websocket?id=${id}`,
       onConnect: () => {
-        console.log("✅ Conectado al servidor WebSocket");
         stompClient.current.subscribe(
           "/user/queue/position-updates",
           (messageServer) => {
@@ -37,7 +35,6 @@ const connect = (stompClient, username, id, setResultServer) => {
         reject(frame.headers.message);
       },
       onWebSocketError: (error) => {
-        console.error("❌ Error en WebSocket: ", error);
         reject(error);
       },
     });
@@ -53,7 +50,6 @@ const sendMessage = (stompClient, object, endpoint) => {
       destination: `/app/${endpoint}`,
       body: JSON.stringify(object),
     });
-    console.log("📩 Mensaje enviado:", object);
   } else {
     console.warn("⚠️ No se puede enviar el mensaje porque la conexión aún no está establecida.");
   }

@@ -18,7 +18,6 @@ const BoardPlayer = ({players = [], playerId}) => {
   for (let index = 0; index < ships.length; index++) {
     const actualShip = ships[index];
     if(actualShip.rotated){
-      console.log("Esta rotado")
       for (let index = 0; index < actualShip.size; index++) {
         const x = actualShip.position.x + index;
         const y = actualShip.position.y;

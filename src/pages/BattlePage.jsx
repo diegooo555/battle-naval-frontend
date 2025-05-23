@@ -37,7 +37,6 @@ function BattlePage() {
       try {
         await connect(stompClient, username, gameId, setDataGameRoom);
         const player = {name: username, gameId}
-        console.log(player)
         sendMessage(stompClient, player, "gameRoom");
       } catch (error) {
         console.error("❌ Error al conectar:", error);

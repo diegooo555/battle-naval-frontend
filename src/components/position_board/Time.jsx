@@ -15,7 +15,6 @@ function Time({ resultServer }) {
     const handleNavigation = async () => {
       try {
         const response = await getNameOponent(username, gameId);
-        console.log(response);
         const opponent = response.status === 200 ? response.data : "Oponente";
         navigate(`/battle/${gameId}/${playerId}/${username}/${opponent}`);
       } catch (error) {

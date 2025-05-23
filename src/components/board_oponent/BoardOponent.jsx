@@ -8,7 +8,10 @@ const BoardOponent = ({sendShot, players, playerId}) => {
   const [stateSelectCell, setStateSelectCell] = useState();
 
   const [boardOponent, setBoardOponent] = useState(
-    Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ""))
+    Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ({
+      state: '',
+      isHunk: false,
+    })))
   );
 
   const player = players.find(player => player.playerId != playerId);
@@ -24,24 +27,44 @@ const BoardOponent = ({sendShot, players, playerId}) => {
   useEffect(() => {
     const showAllShots = () => {
       const shots = player?.board.shots || [];
+
+      const ships = player?.board.ships || [];
   
-      const newBoard = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ""));
+      const newBoard = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ({
+        state: '',
+        isSunk: false,
+      })));
   
       shots.forEach(shot => {
         const { x, y } = shot.position;
         const result = shot.result;
         if (result === "FAIL") {
-          newBoard[x][y] = "O";
+          newBoard[x][y].state = "O";
         } else if (result === "HIT") {
-          newBoard[x][y] = "X";
+          newBoard[x][y].state = "X";
         }
       });
+
+      ships.forEach(ship => {
+        if(ship.sunk){
+          const { x, y } = ship.position;
+          const size = ship.size;
+          for(let index = 0; index < size; index ++){
+            if(ship.rotated){
+              newBoard[x + index][y].isSunk = true;
+            }else{
+              newBoard[x][y + index].isSunk = true;
+            }
+          }
+        }
+        
+      })
   
       setBoardOponent(newBoard); // Se actualiza el tablero completo una sola vez
     };
   
     showAllShots();
-  }, [player?.board.shots]);
+  }, [player?.board.ships, player?.board.shots]);
   
   return (
     <div className="w-[50%] h-full flex flex-col items-center justify-center gap-5">

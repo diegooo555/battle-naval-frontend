@@ -11,10 +11,10 @@ function Cell({ row, col }) {
       items-center justify-center
       border border-solid  border-black  
       cursor-pointer ${
-        contextCell?.stateSelectCell?.row == row && contextCell?.stateSelectCell?.col == col
+      contextCell?.stateSelectCell?.row == row && contextCell?.stateSelectCell?.col == col
           ? "bg-green-300"
-          : "bg-[#ACD1DB] hover:bg-blue-400"
-      }`}
+          : " hover:bg-blue-400"
+      } ${stateCell.isSunk ? 'bg-[#416BBF]':'bg-[#ACD1DB]'}`}
       onClick={() => {
           contextCell.setStateSelectCell({
             row: row,
@@ -23,9 +23,9 @@ function Cell({ row, col }) {
       }}
     >
       <span
-        className={`${stateCell == 'X' ? 'text-[#FF0000]' : 'text-[#1500FF]'} text-2xl font-bold`}
+        className={`${stateCell.state == 'X' ? 'text-[#FF0000]' : 'text-[#1500FF]'} text-2xl font-bold`}
       >
-        {stateCell}
+        {stateCell.state}
       </span>
     </button>
   );

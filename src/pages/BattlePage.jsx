@@ -37,7 +37,7 @@ function BattlePage() {
     }
   }
 
-  if(dataGameRoom?.gameStatus === "FINISHED"){
+  if(dataGameRoom?.gameStatus === "DISCONNECTED"){
     navigate("/disconnect/" + username);
     disconnectGame(stompClient, player);
   }

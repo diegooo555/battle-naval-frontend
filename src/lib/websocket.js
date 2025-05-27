@@ -8,6 +8,12 @@ const disconnect = (stompClient) => {
     }
 };
 
+const disconnectGame = (stompClient, player) => {
+  if(stompClient.current){
+    sendMessage(stompClient, player, "disconnect");
+  }
+}
+
 const connect = (stompClient, username, id, setResultServer) => {
   return new Promise((resolve, reject) => {
     if (!username)return;
@@ -56,4 +62,4 @@ const sendMessage = (stompClient, object, endpoint) => {
 };
 
 
-export { connect, disconnect, sendMessage };
+export { connect, disconnect, sendMessage, disconnectGame };

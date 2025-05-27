@@ -5,15 +5,19 @@ import UsersProfiles from "../components/UsersProfiles";
 import Waiting from "../components/Waiting";
 import { useNavigate, useParams } from "react-router";
 import { useWebSocket } from "../context/useWebSocket";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import TimeContext from "../context/TimeContext";
 
 
 function BattlePage() {
   const {gameId, username, playerId, opponent} = useParams();
-  const {stompClient, connect, disconnect, sendMessage} = useWebSocket();
+  const {stompClient, connect, disconnect, sendMessage, disconnectGame} = useWebSocket();
   const [dataGameRoom, setDataGameRoom] = useState(null);
   const [time, setTime] = useState(0);
   const [isCurrentTurn, setIsCurrentTurn] = useState(false);
+  const [lastSunkShip, setLastSunkShip] = useState(null);
+
   const player = {
     username,
     gameId,
@@ -29,7 +33,13 @@ function BattlePage() {
       }else{
         navigate("/loser/" + username);
       }
+      disconnect(stompClient);
     }
+  }
+
+  if(dataGameRoom?.gameStatus === "FINISHED"){
+    navigate("/disconnect/" + username);
+    disconnectGame(stompClient, player);
   }
 
   useEffect(() => {
@@ -43,15 +53,47 @@ function BattlePage() {
       }
     }
     startBattle();
+  
     return () => {
-      disconnect(stompClient);
-    }
+      disconnectGame(stompClient, player);
+    };
   }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      disconnectGame(stompClient, player); // o simplemente disconnect(stompClient)
+    };
+  
+    window.addEventListener("beforeunload", handleBeforeUnload);
+  
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+  
+  
 
   useEffect(() => {
     setIsCurrentTurn(dataGameRoom?.currentTurn == playerId);
     setTime(0);
-  },[dataGameRoom, isCurrentTurn, playerId])
+
+    if (dataGameRoom?.lastSunkShip !== null && dataGameRoom?.lastSunkShip !== undefined && dataGameRoom.lastSunkShip !== lastSunkShip) {
+      const shipNames = ["Acorazado", "Destructor", "Cruzero", "Submarino", "Navío"];
+      const shipName = shipNames[dataGameRoom.lastSunkShip] || "Barco";
+      toast.success(`🚢 ¡${shipName} hundido!`, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      
+      setLastSunkShip(dataGameRoom.lastSunkShip);
+    }
+  },[dataGameRoom, isCurrentTurn, lastSunkShip, playerId])
 
   const handleShot = (row, col) => {
     const shot = {
@@ -79,6 +121,7 @@ function BattlePage() {
           <BoardPlayer players={dataGameRoom.listPlayers} playerId={playerId}/>
           <BoardOponent sendShot={handleShot} players={dataGameRoom.listPlayers} playerId={playerId}/>
         </div>
+      <ToastContainer/>
       </div> : <Waiting/>}
     </TimeContext.Provider>
   );

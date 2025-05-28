@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import BoardPlayer from "../components/board_player/BoardPlayer";
 import BoardOponent from "../components/board_oponent/BoardOponent";
 import UsersProfiles from "../components/UsersProfiles";
-import Waiting from "../components/Waiting";
+import WaitingBattle from "../components/WaitingBattle";
 import { useNavigate, useParams } from "react-router";
 import { useWebSocket } from "../context/useWebSocket";
 import { ToastContainer, toast } from 'react-toastify';
@@ -12,7 +12,7 @@ import TimeContext from "../context/TimeContext";
 
 function BattlePage() {
   const {gameId, username, playerId, opponent} = useParams();
-  const {stompClient, connect, disconnect, sendMessage, disconnectGame} = useWebSocket();
+  const {stompClient, connect, disconnect, sendMessage, disconnectGame, restoreInitialState} = useWebSocket();
   const [dataGameRoom, setDataGameRoom] = useState(null);
   const [time, setTime] = useState(0);
   const [isCurrentTurn, setIsCurrentTurn] = useState(false);
@@ -26,21 +26,22 @@ function BattlePage() {
 
   const navigate = useNavigate();
 
-  if(dataGameRoom != null){
-    if(dataGameRoom.winner != null){
-      if(dataGameRoom.winner.playerId === playerId){
-        navigate("/winner/" + username);
-      }else{
-        navigate("/loser/" + username);
-      }
-      disconnect(stompClient);
+useEffect(() => {
+  if (dataGameRoom?.winner != null) {
+    disconnect(stompClient);
+    if (dataGameRoom.winner.playerId === playerId) {
+      navigate("/winner/" + username);
+    } else {
+      navigate("/loser/" + username);
     }
   }
 
-  if(dataGameRoom?.gameStatus === "DISCONNECTED"){
+  if (dataGameRoom?.gameStatus === "DISCONNECTED") {
     navigate("/disconnect/" + username);
     disconnectGame(stompClient, player);
   }
+}, [dataGameRoom]);
+
 
   useEffect(() => {
     const startBattle = async () => {
@@ -55,13 +56,14 @@ function BattlePage() {
     startBattle();
   
     return () => {
-      disconnectGame(stompClient, player);
+      disconnect(stompClient);
     };
   }, []);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      disconnectGame(stompClient, player); // o simplemente disconnect(stompClient)
+      disconnectGame(stompClient, player);
+      restoreInitialState();
     };
   
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -122,7 +124,7 @@ function BattlePage() {
           <BoardOponent sendShot={handleShot} players={dataGameRoom.listPlayers} playerId={playerId}/>
         </div>
       <ToastContainer/>
-      </div> : <Waiting/>}
+      </div> : <WaitingBattle/>}
     </TimeContext.Provider>
   );
 }

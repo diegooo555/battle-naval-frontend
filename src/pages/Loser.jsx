@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router';
+import { useWebSocket } from "../context/useWebSocket.js";
 
 const Loser = () => {
   const {username} = useParams();
+  const {restoreInitialState} = useWebSocket();
+
+  useEffect(() => {
+    restoreInitialState();
+  }
+  , []);
+
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-purple-400 to-gray-300 text-white p-4 gap-4">
 

@@ -6,9 +6,15 @@ import StompClientContext from "./webSocket.js";
 export const WebSockerProvider = ({ children }) => {
   const [resultServer, setResultServer] = useState("Waiting");
   const stompClient = useRef(null);
+
+  const restoreInitialState = () => {
+    setResultServer("Waiting");
+    stompClient.current = null;
+  }
+
   return (
     <StompClientContext.Provider
-      value={{ stompClient, connect, disconnect, sendMessage, resultServer, setResultServer, disconnectGame}}
+      value={{ stompClient, connect, disconnect, sendMessage, resultServer, setResultServer, disconnectGame, restoreInitialState }}
     >
       {children}
     </StompClientContext.Provider>

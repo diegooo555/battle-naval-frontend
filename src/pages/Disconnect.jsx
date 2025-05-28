@@ -4,11 +4,14 @@ import { useWebSocket } from '../context/useWebSocket.js';
 
 const Disconnect = () => {
   const {username} = useParams();
-  const {stompClient, disconnectGame} = useWebSocket();
 
-  useEffect(() => {
-    disconnectGame(stompClient);
-  }, [])
+    const {restoreInitialState} = useWebSocket();
+  
+    useEffect(() => {
+      restoreInitialState();
+    }
+    , []);
+
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-purple-400 to-gray-300 text-white p-4 gap-4">
 
